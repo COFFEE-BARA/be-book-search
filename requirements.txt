@@ -1,0 +1,2 @@
+Django==5.0.1
+elasticsearch-dsl==8.11.3
