@@ -28,7 +28,7 @@ class SearchView(APIView):
 
     def get(self, request):
         es = Elasticsearch(
-            cloud_id= 'SMW-Coffeebara:dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbTo0NDMkZGMyZWVhOTZiYzFjNDg4YjlhM2JhZDg2YmE5YzY4NTMkMjhjMjlhNWZjYTU4NDk5NWJhYTAwODA2MGZhOGY1MjU=',
+            cloud_id= '',
             api_key='',
             request_timeout=600
         )
