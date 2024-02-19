@@ -1,18 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"bytes" 
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	elasticsearch "github.com/elastic/go-elasticsearch/v8"
 )
-
 
 // var (
 // 	elasticCloudID = ""
@@ -42,6 +41,14 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	elasticAPIKey := os.Getenv("ELASTIC_API_KEY")
 	elasticIndex := os.Getenv("ELASTIC_INDEX")
 
+	// Set CORS headers
+	headers := map[string]string{
+		"Access-Control-Allow-Origin":  "*", // Allow requests from any origin
+		"Access-Control-Allow-Headers": "Content-Type",
+		"Access-Control-Allow-Methods": "*", // Allow all methods
+		// Add more CORS headers if needed
+	}
+
 	cfg := elasticsearch.Config{
 		CloudID: elasticCloudID,
 		APIKey:  elasticAPIKey,
@@ -52,6 +59,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, _ := json.Marshal(ResponseMessage{500, "서버 에러", nil})
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    headers,
 			Body:       string(response),
 		}, nil
 	}
@@ -61,6 +69,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, _ := json.Marshal(ResponseMessage{400, "keyword가 없습니다.", nil})
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
+			Headers:    headers,
 			Body:       string(response),
 		}, nil
 	}
@@ -81,6 +90,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, _ := json.Marshal(ResponseMessage{500, "서버 에러", nil})
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    headers,
 			Body:       string(response),
 		}, nil
 	}
@@ -96,6 +106,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, _ := json.Marshal(ResponseMessage{500, "서버 에러", nil})
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    headers,
 			Body:       string(response),
 		}, nil
 	}
@@ -107,6 +118,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		response, _ := json.Marshal(ResponseMessage{500, "서버 에러", nil})
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
+			Headers:    headers,
 			Body:       string(response),
 		}, nil
 	}
@@ -117,9 +129,9 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		source := hit.(map[string]any)["_source"].(map[string]any)
 		var price string
 		if p, ok := source["Price"].(float64); ok {
-			price = fmt.Sprintf("%.2f", p) 
+			price = fmt.Sprintf("%.2f", p)
 		} else if p, ok := source["Price"].(string); ok {
-			price = p 
+			price = p
 		} else {
 			price = "Unknown"
 		}
@@ -135,6 +147,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	response, _ := json.Marshal(ResponseMessage{200, "검색 결과를 가져오는데 성공했습니다.", map[string]any{"bookList": bookList}})
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
+		Headers:    headers,
 		Body:       string(response),
 	}, nil
 }
@@ -143,12 +156,11 @@ func main() {
 	lambda.Start(Handler)
 }
 
-
 // func main() {
 // 	// 테스트용 이벤트 데이터
 // 	event := events.APIGatewayProxyRequest{
 // 		QueryStringParameters: map[string]string{
-// 			"keyword": "서버리스", 
+// 			"keyword": "서버리스",
 // 		},
 // 	}
 
