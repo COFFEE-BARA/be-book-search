@@ -78,7 +78,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		"query": map[string]any{
 			"multi_match": map[string]any{
 				"query":  searchWord,
-				"fields": []string{"Title", "Author.partial", "Author.keyword"},
+				"fields": []string{"Title"},
 			},
 		},
 		"_source": []string{"Title", "Author", "ImageURL", "Price"},
